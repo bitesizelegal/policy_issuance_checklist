@@ -4,6 +4,7 @@ from methods import ChecklistMethods
 from save import ChecklistSave
 from lenders import LenderManager
 from pdf_export import PDFExporter
+from datetime import datetime  # Added import for datetime
 
 class ChecklistApp(ChecklistMethods, ChecklistSave):
     def __init__(self, root):
@@ -24,79 +25,103 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
         self.lender_manager = LenderManager()
 
         # File Number
-        tk.Label(root, text="File Number").pack()
+        tk.Label(root, text="File Number").pack(pady=5)
         self.file_number = tk.Entry(root, width=20)
-        self.file_number.pack()
+        self.file_number.pack(pady=5)
 
         # Progress Tracking
         self.progress_label = tk.Label(root, text="Progress: 0% Complete (0 fields remaining)")
-        self.progress_label.pack()
+        self.progress_label.pack(pady=5)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # Matter Folder Path
-        tk.Label(root, text="Matter Folder Path").pack()
+        tk.Label(root, text="Matter Folder Path").pack(pady=5)
         self.path_var = tk.StringVar()
-        tk.Entry(root, textvariable=self.path_var, width=50).pack()
-        tk.Button(root, text="Browse", command=self.browse_folder).pack()
+        tk.Entry(root, textvariable=self.path_var, width=50).pack(pady=5)
+        tk.Button(root, text="Browse", command=self.browse_folder).pack(pady=5)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # State
-        tk.Label(root, text="State").pack()
+        tk.Label(root, text="State").pack(pady=5)
         self.state = ttk.Combobox(root, values=["AL", "GA"], width=10)
-        self.state.pack()
+        self.state.pack(pady=5)
         self.state.bind("<<ComboboxSelected>>", self.update_form)
 
         # Deal Type
-        tk.Label(root, text="Deal Type").pack()
+        tk.Label(root, text="Deal Type").pack(pady=5)
         self.deal_type = ttk.Combobox(root, values=["Loan", "Refinance", "Cash", "Other"])
-        self.deal_type.pack()
+        self.deal_type.pack(pady=5)
         self.deal_type.bind("<<ComboboxSelected>>", self.update_form)
 
         # Lender Selection
-        tk.Label(root, text="Lender").pack()
+        tk.Label(root, text="Lender").pack(pady=5)
         self.lender = ttk.Combobox(root, values=self.lender_manager.get_lender_list(), width=20)
-        self.lender.pack()
+        self.lender.pack(pady=5)
         self.lender.bind("<<ComboboxSelected>>", lambda e: [self.update_lender_endorsements(), self.update_lender_2nd_position()])
 
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
+
         # 2nd Position Check (Radio Button)
-        self.lender_2nd_frame = tk.Frame(root)
-        tk.Label(self.lender_2nd_frame, text="2nd Position Loan?").pack(side=tk.LEFT)
+        self.lender_2nd_frame = tk.Frame(root, bd=2, relief=tk.GROOVE)
+        tk.Label(self.lender_2nd_frame, text="2nd Position Loan?").pack(side=tk.LEFT, padx=5)
         self.lender_2nd = tk.StringVar(value="No")
-        tk.Radiobutton(self.lender_2nd_frame, text="Yes", value="Yes", variable=self.lender_2nd, command=lambda: [self.update_lender_2nd_position(), self.update_progress()]).pack(side=tk.LEFT)
-        tk.Radiobutton(self.lender_2nd_frame, text="No", value="No", variable=self.lender_2nd, command=lambda: [self.update_lender_2nd_position(), self.update_progress()]).pack(side=tk.LEFT)
+        tk.Radiobutton(self.lender_2nd_frame, text="Yes", value="Yes", variable=self.lender_2nd, command=lambda: [self.update_lender_2nd_position(), self.update_progress()]).pack(side=tk.LEFT, padx=5)
+        tk.Radiobutton(self.lender_2nd_frame, text="No", value="No", variable=self.lender_2nd, command=lambda: [self.update_lender_2nd_position(), self.update_progress()]).pack(side=tk.LEFT, padx=5)
 
         self.lender_exceptions_frame = tk.Frame(self.lender_2nd_frame)
         self.lender_exceptions = tk.BooleanVar()
-        tk.Checkbutton(self.lender_exceptions_frame, text="Reflected in Policy Exceptions", variable=self.lender_exceptions, command=self.update_progress).pack()
+        tk.Checkbutton(self.lender_exceptions_frame, text="Reflected in Policy Exceptions", variable=self.lender_exceptions, command=self.update_progress).pack(padx=5)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # General Checks
-        tk.Label(root, text="General Checks").pack()
+        tk.Label(root, text="General Checks").pack(pady=5)
         self.checks = {
             "title_search": tk.BooleanVar(),
             "signatures_verified": tk.BooleanVar(),
         }
         for check, var in self.checks.items():
-            tk.Checkbutton(root, text=check.replace("_", " ").title(), variable=var, command=self.update_progress).pack()
+            tk.Checkbutton(root, text=check.replace("_", " ").title(), variable=var, command=self.update_progress).pack(pady=2)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # Document Section
-        tk.Label(root, text="Documents").pack()
-        self.doc_frame = tk.Frame(root)
-        self.doc_frame.pack()
+        tk.Label(root, text="Documents").pack(pady=5)
+        self.doc_frame = tk.Frame(root, bd=2, relief=tk.GROOVE)
+        self.doc_frame.pack(fill=tk.X, padx=5, pady=5)
         self.add_document_field()
-        tk.Button(root, text="Add Document", command=self.add_document_field).pack()
+        tk.Button(root, text="Add Document", command=self.add_document_field).pack(pady=5)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # Rider Section (initially hidden)
         self.rider_label = tk.Label(root, text="SD Riders")
-        self.rider_frame = tk.Frame(root)
+        self.rider_frame = tk.Frame(root, bd=2, relief=tk.GROOVE)
         self.add_rider_button = tk.Button(root, text="Add Rider", command=self.add_rider_field)
 
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
+
         # Title Endorsements Section
-        tk.Label(root, text="Title Endorsements").pack()
-        self.endorsement_frame = tk.Frame(root)
-        self.endorsement_frame.pack()
-        tk.Button(root, text="Add Endorsement", command=self.add_endorsement_field).pack()
+        tk.Label(root, text="Title Endorsements").pack(pady=5)
+        self.endorsement_frame = tk.Frame(root, bd=2, relief=tk.GROOVE)
+        self.endorsement_frame.pack(fill=tk.X, padx=5, pady=5)
+        tk.Button(root, text="Add Endorsement", command=self.add_endorsement_field).pack(pady=5)
+
+        # Separator
+        tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
 
         # Save Buttons
-        tk.Button(root, text="Save to JSON", command=self.save_to_json).pack()
-        tk.Button(root, text="Save to PDF", command=self.save_to_pdf).pack()
+        tk.Button(root, text="Save to JSON", command=self.save_to_json).pack(pady=5)
+        tk.Button(root, text="Save to PDF", command=self.save_to_pdf).pack(pady=5)
 
     def update_lender_endorsements(self):
         # Preserve manually added endorsements
@@ -116,12 +141,12 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
                 frame.pack(pady=5)
                 e = {}
                 e["frame"] = frame
-                tk.Label(frame, text=endorsement).pack(side=tk.LEFT)
+                tk.Label(frame, text=endorsement).pack(side=tk.LEFT, padx=5)
                 e["type"] = tk.StringVar(value=endorsement)
                 e["custom_name"] = tk.StringVar(value="")
                 e["correct"] = tk.BooleanVar()
-                tk.Checkbutton(frame, text="Correct", variable=e["correct"], command=self.update_progress).pack(side=tk.LEFT)
-                tk.Button(frame, text="Remove", command=lambda f=e: self.remove_endorsement(f)).pack(side=tk.LEFT)
+                tk.Checkbutton(frame, text="Correct", variable=e["correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
+                tk.Button(frame, text="Remove", command=lambda f=e: self.remove_endorsement(f)).pack(side=tk.LEFT, padx=5)
                 self.endorsements.append(e)
 
         # Re-add manual endorsements
@@ -130,21 +155,21 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
             frame.pack(pady=5)
             new_e = {}
             new_e["frame"] = frame
-            tk.Label(frame, text=e["type"].get()).pack(side=tk.LEFT)
+            tk.Label(frame, text=e["type"].get()).pack(side=tk.LEFT, padx=5)
             new_e["type"] = tk.StringVar(value=e["type"].get())
             new_e["custom_name"] = tk.StringVar(value=e["custom_name"].get())
             new_e["correct"] = tk.BooleanVar(value=e["correct"].get())
-            tk.Checkbutton(frame, text="Correct", variable=new_e["correct"], command=self.update_progress).pack(side=tk.LEFT)
-            tk.Button(frame, text="Remove", command=lambda f=new_e: self.remove_endorsement(f)).pack(side=tk.LEFT)
+            tk.Checkbutton(frame, text="Correct", variable=new_e["correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
+            tk.Button(frame, text="Remove", command=lambda f=new_e: self.remove_endorsement(f)).pack(side=tk.LEFT, padx=5)
             self.endorsements.append(new_e)
 
         self.update_progress()
 
     def update_lender_2nd_position(self):
         if self.lender.get():
-            self.lender_2nd_frame.pack()
+            self.lender_2nd_frame.pack(pady=5)
             if self.lender_2nd.get() == "Yes":
-                self.lender_exceptions_frame.pack()
+                self.lender_exceptions_frame.pack(padx=20)
             else:
                 self.lender_exceptions_frame.pack_forget()
         else:
@@ -179,6 +204,9 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
                 return
             if doc_type in ["POA", "Affidavit"] and not doc["ssn_redacted"].get():
                 messagebox.showerror("Error", f"SSN Redaction required for {doc_type}. Please correct and restart.")
+                return
+            if state == "GA" and doc_type == "SD" and not doc["cover_page_attached"].get():
+                messagebox.showerror("Error", f"Cover Page must be attached for GA Security Deeds. Please correct and restart.")
                 return
 
         for rider in self.riders:
@@ -223,7 +251,8 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
                         "recording_date_time_correct": doc["recording_date_time_correct"].get(),
                         "tax_parcel_number_correct": doc["tax_parcel_number_correct"].get() if doc["type"].get() == "Deed" and state == "GA" else True,
                         "marital_status_correct": doc["marital_status_correct"].get() if doc["type"].get() in ["Deed", "Mortgage"] and state == "AL" else True,
-                        "ssn_redacted": doc["ssn_redacted"].get() if doc["type"].get() in ["POA", "Affidavit"] else False
+                        "ssn_redacted": doc["ssn_redacted"].get() if doc["type"].get() in ["POA", "Affidavit"] else False,
+                        "cover_page_attached": doc["cover_page_attached"].get() if doc["type"].get() == "SD" and state == "GA" else False
                     }
                 } for doc in self.documents
             ],
@@ -232,7 +261,6 @@ class ChecklistApp(ChecklistMethods, ChecklistSave):
                     "type": rider["type"].get(),
                     "custom_name": rider["custom_name"].get() if rider["type"].get() == "Custom" else "",
                     "correct": rider["correct"].get(),
-                    "cover_page_attached": rider["cover_page"].get() if self.state.get() == "GA" else False
                 } for rider in self.riders
             ],
             "title_endorsements": [
