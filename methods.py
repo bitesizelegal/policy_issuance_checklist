@@ -66,6 +66,8 @@ class ChecklistMethods:
                 mandatory_fields.append(doc["marital_status_correct"])
             if doc_type in ["POA", "Affidavit"]:
                 mandatory_fields.append(doc["ssn_redacted"])
+            if state == "GA" and doc_type == "SD":
+                mandatory_fields.append(doc["cover_page_attached"])
 
             # Count mandatory fields
             total_fields += len(mandatory_fields)
@@ -86,10 +88,6 @@ class ChecklistMethods:
             total_fields += 1  # "Correct" is mandatory
             if rider["correct"].get():
                 checked_fields += 1
-            if state == "GA":
-                total_fields += 1  # "Cover Page" is mandatory in GA
-                if rider["cover_page"].get():
-                    checked_fields += 1
 
         # Endorsements Checkboxes
         for endorsement in self.endorsements:
@@ -120,37 +118,37 @@ class ChecklistMethods:
         for doc in self.documents:
             doc_type = doc["type"].get()
             if state == "GA" and doc_type == "Deed":
-                doc["tax_parcel_frame"].pack(side=tk.LEFT)
+                doc["tax_parcel_frame"].pack(side=tk.LEFT, padx=5)
             else:
                 doc["tax_parcel_frame"].pack_forget()
             if state == "AL" and doc_type in ["Deed", "Mortgage"]:
-                doc["marital_frame"].pack(side=tk.LEFT)
+                doc["marital_frame"].pack(side=tk.LEFT, padx=5)
             else:
                 doc["marital_frame"].pack_forget()
             if doc_type in ["POA", "Affidavit"]:
-                doc["ssn_frame"].pack(side=tk.LEFT)
+                doc["ssn_frame"].pack(side=tk.LEFT, padx=5)
             else:
                 doc["ssn_frame"].pack_forget()
+            if state == "GA" and doc_type == "SD":
+                doc["cover_frame"].pack(side=tk.LEFT, padx=5)
+            else:
+                doc["cover_frame"].pack_forget()
 
     def update_rider_fields(self):
         state = self.state.get()
         for rider in self.riders:
             rider_type = rider["type"].get()
             if rider_type == "Custom":
-                rider["custom_frame"].pack(side=tk.LEFT)
+                rider["custom_frame"].pack(side=tk.LEFT, padx=5)
             else:
                 rider["custom_frame"].pack_forget()
-            if state == "GA":
-                rider["cover_frame"].pack(side=tk.LEFT)
-            else:
-                rider["cover_frame"].pack_forget()
 
     def update_endorsement_fields(self):
         state = self.state.get()
         for endorsement in self.endorsements:
             endorsement_type = endorsement["type"].get()
             if endorsement_type == "Custom":
-                endorsement["custom_frame"].pack(side=tk.LEFT)
+                endorsement["custom_frame"].pack(side=tk.LEFT, padx=5)
             else:
                 endorsement["custom_frame"].pack_forget()
             if state == "GA" and endorsement_type == "GA Usury":
@@ -163,68 +161,73 @@ class ChecklistMethods:
         frame.pack(pady=5)
         doc = {}
 
-        tk.Label(frame, text="Type").pack(side=tk.LEFT)
+        tk.Label(frame, text="Type").pack(side=tk.LEFT, padx=5)
         doc["type"] = ttk.Combobox(frame, values=["Deed", "Mortgage", "SD", "Affidavit", "POA", "Notice"], width=15)
-        doc["type"].pack(side=tk.LEFT)
+        doc["type"].pack(side=tk.LEFT, padx=5)
         doc["type"].bind("<<ComboboxSelected>>", lambda e: self.update_form())
 
-        tk.Label(frame, text="Names").pack(side=tk.LEFT)
+        tk.Label(frame, text="Names").pack(side=tk.LEFT, padx=5)
         doc["names_correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["names_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["names_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Sigs").pack(side=tk.LEFT)
+        tk.Label(frame, text="Sigs").pack(side=tk.LEFT, padx=5)
         doc["signatures_present"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Present", variable=doc["signatures_present"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Present", variable=doc["signatures_present"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Notary").pack(side=tk.LEFT)
+        tk.Label(frame, text="Notary").pack(side=tk.LEFT, padx=5)
         doc["correct_notary_block"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["correct_notary_block"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["correct_notary_block"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Legal").pack(side=tk.LEFT)
+        tk.Label(frame, text="Legal").pack(side=tk.LEFT, padx=5)
         doc["legal_attached"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Attached", variable=doc["legal_attached"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Attached", variable=doc["legal_attached"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Exh B").pack(side=tk.LEFT)
+        tk.Label(frame, text="Exh B").pack(side=tk.LEFT, padx=5)
         doc["exhibit_b_attached"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Attached", variable=doc["exhibit_b_attached"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Attached", variable=doc["exhibit_b_attached"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Other Exhs").pack(side=tk.LEFT)
+        tk.Label(frame, text="Other Exhs").pack(side=tk.LEFT, padx=5)
         doc["other_exhibits_attached"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Attached", variable=doc["other_exhibits_attached"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Attached", variable=doc["other_exhibits_attached"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Exec Date").pack(side=tk.LEFT)
+        tk.Label(frame, text="Exec Date").pack(side=tk.LEFT, padx=5)
         doc["execution_date_correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["execution_date_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["execution_date_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Rec Date").pack(side=tk.LEFT)
+        tk.Label(frame, text="Rec Date").pack(side=tk.LEFT, padx=5)
         doc["recording_date_correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["recording_date_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["recording_date_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Book-Page").pack(side=tk.LEFT)
+        tk.Label(frame, text="Book-Page").pack(side=tk.LEFT, padx=5)
         doc["recording_book_page_correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["recording_book_page_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["recording_book_page_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Label(frame, text="Rec Time").pack(side=tk.LEFT)
+        tk.Label(frame, text="Rec Time").pack(side=tk.LEFT, padx=5)
         doc["recording_date_time_correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=doc["recording_date_time_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=doc["recording_date_time_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
         doc["tax_parcel_frame"] = tk.Frame(frame)
-        tk.Label(doc["tax_parcel_frame"], text="Tax Parcel").pack(side=tk.LEFT)
+        tk.Label(doc["tax_parcel_frame"], text="Tax Parcel").pack(side=tk.LEFT, padx=5)
         doc["tax_parcel_number_correct"] = tk.BooleanVar()
-        tk.Checkbutton(doc["tax_parcel_frame"], text="Correct", variable=doc["tax_parcel_number_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(doc["tax_parcel_frame"], text="Correct", variable=doc["tax_parcel_number_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
         doc["marital_frame"] = tk.Frame(frame)
-        tk.Label(doc["marital_frame"], text="Marital Status").pack(side=tk.LEFT)
+        tk.Label(doc["marital_frame"], text="Marital Status").pack(side=tk.LEFT, padx=5)
         doc["marital_status_correct"] = tk.BooleanVar()
-        tk.Checkbutton(doc["marital_frame"], text="Correct", variable=doc["marital_status_correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(doc["marital_frame"], text="Correct", variable=doc["marital_status_correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
         doc["ssn_frame"] = tk.Frame(frame)
-        tk.Label(doc["ssn_frame"], text="SSN Redacted").pack(side=tk.LEFT)
+        tk.Label(doc["ssn_frame"], text="SSN Redacted").pack(side=tk.LEFT, padx=5)
         doc["ssn_redacted"] = tk.BooleanVar()
-        tk.Checkbutton(doc["ssn_frame"], variable=doc["ssn_redacted"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(doc["ssn_frame"], variable=doc["ssn_redacted"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
+
+        doc["cover_frame"] = tk.Frame(frame)
+        tk.Label(doc["cover_frame"], text="Cover Page").pack(side=tk.LEFT, padx=5)
+        doc["cover_page_attached"] = tk.BooleanVar()
+        tk.Checkbutton(doc["cover_frame"], text="Attached", variable=doc["cover_page_attached"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
         doc["frame"] = frame
-        tk.Button(frame, text="Remove", command=lambda d=doc: self.remove_document(d)).pack(side=tk.LEFT)
+        tk.Button(frame, text="Remove", command=lambda d=doc: self.remove_document(d)).pack(side=tk.LEFT, padx=5)
 
         self.documents.append(doc)
         self.update_form()
@@ -240,23 +243,19 @@ class ChecklistMethods:
             frame.pack(pady=5)
             rider = {}
 
-            tk.Label(frame, text="Rider").pack(side=tk.LEFT)
+            tk.Label(frame, text="Rider").pack(side=tk.LEFT, padx=5)
             rider["type"] = ttk.Combobox(frame, values=self.standard_riders, width=20)
-            rider["type"].pack(side=tk.LEFT)
+            rider["type"].pack(side=tk.LEFT, padx=5)
             rider["type"].bind("<<ComboboxSelected>>", lambda e: self.update_rider_fields())
 
             rider["custom_frame"] = tk.Frame(frame)
-            tk.Label(rider["custom_frame"], text="Custom Name").pack(side=tk.LEFT)
+            tk.Label(rider["custom_frame"], text="Custom Name").pack(side=tk.LEFT, padx=5)
             rider["custom_name"] = tk.Entry(rider["custom_frame"], width=20)
-            rider["custom_name"].pack(side=tk.LEFT)
+            rider["custom_name"].pack(side=tk.LEFT, padx=5)
 
-            tk.Label(frame, text="Rider").pack(side=tk.LEFT)
+            tk.Label(frame, text="Rider").pack(side=tk.LEFT, padx=5)
             rider["correct"] = tk.BooleanVar()
-            tk.Checkbutton(frame, text="Correct", variable=rider["correct"], command=self.update_progress).pack(side=tk.LEFT)
-
-            rider["cover_frame"] = tk.Frame(frame)
-            rider["cover_page"] = tk.BooleanVar()
-            tk.Checkbutton(rider["cover_frame"], text="Cover Page Attached", variable=rider["cover_page"], command=self.update_progress).pack(side=tk.LEFT)
+            tk.Checkbutton(frame, text="Correct", variable=rider["correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
             self.riders.append(rider)
             self.update_rider_fields()
@@ -270,20 +269,20 @@ class ChecklistMethods:
         endorsement = {}
         endorsement["frame"] = frame
 
-        tk.Label(frame, text="Endorsement").pack(side=tk.LEFT)
+        tk.Label(frame, text="Endorsement").pack(side=tk.LEFT, padx=5)
         endorsement["type"] = ttk.Combobox(frame, values=self.common_endorsements + ["GA Usury"], width=20)
-        endorsement["type"].pack(side=tk.LEFT)
+        endorsement["type"].pack(side=tk.LEFT, padx=5)
         endorsement["type"].bind("<<ComboboxSelected>>", lambda e: self.update_endorsement_fields())
 
         endorsement["custom_frame"] = tk.Frame(frame)
-        tk.Label(endorsement["custom_frame"], text="Custom Name").pack(side=tk.LEFT)
+        tk.Label(endorsement["custom_frame"], text="Custom Name").pack(side=tk.LEFT, padx=5)
         endorsement["custom_name"] = tk.Entry(endorsement["custom_frame"], width=20)
-        endorsement["custom_name"].pack(side=tk.LEFT)
+        endorsement["custom_name"].pack(side=tk.LEFT, padx=5)
 
         endorsement["correct"] = tk.BooleanVar()
-        tk.Checkbutton(frame, text="Correct", variable=endorsement["correct"], command=self.update_progress).pack(side=tk.LEFT)
+        tk.Checkbutton(frame, text="Correct", variable=endorsement["correct"], command=self.update_progress).pack(side=tk.LEFT, padx=5)
 
-        tk.Button(frame, text="Remove", command=lambda e=endorsement: self.remove_endorsement(e)).pack(side=tk.LEFT)
+        tk.Button(frame, text="Remove", command=lambda e=endorsement: self.remove_endorsement(e)).pack(side=tk.LEFT, padx=5)
 
         self.endorsements.append(endorsement)
         self.update_endorsement_fields()
