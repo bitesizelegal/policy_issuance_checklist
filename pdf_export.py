@@ -1,6 +1,6 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from datetime import datetime
 
@@ -37,15 +37,19 @@ class PDFExporter:
     def add_title(self, file_number):
         self.elements.append(Paragraph(f"Title Policy Checklist - File Number: {file_number}", self.title_style))
         self.elements.append(Spacer(1, 12))
+        self.elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        self.elements.append(Spacer(1, 12))
 
     def add_section(self, title, data, headers):
         if data:
             self.elements.append(Paragraph(title, self.heading_style))
-            self.elements.append(Spacer(1, 6))
+            self.elements.append(Spacer(1, 12))
             table_data = [headers] + data
             table = Table(table_data)
             table.setStyle(self.table_style)
             self.elements.append(table)
+            self.elements.append(Spacer(1, 24))
+            self.elements.append(HRFlowable(width="100%", thickness=1, color=colors.black))
             self.elements.append(Spacer(1, 12))
 
     def add_text(self, text):
@@ -80,7 +84,7 @@ class PDFExporter:
             "Legal Attached", "Exh B Attached", "Other Exhs Attached",
             "Exec Date Correct", "Rec Date Correct", "Book-Page Correct",
             "Rec Time Correct", "Tax Parcel Correct", "Marital Status Correct",
-            "SSN Redacted"
+            "SSN Redacted", "Cover Page Attached"
         ]
         doc_data = []
         for doc in documents:
@@ -100,19 +104,19 @@ class PDFExporter:
                 "Yes" if checks["recording_date_time_correct"] else "No",
                 "Yes" if checks["tax_parcel_number_correct"] else ("No" if state == "GA" and doc_type == "Deed" else "N/A"),
                 "Yes" if checks["marital_status_correct"] else ("No" if state == "AL" and doc_type in ["Deed", "Mortgage"] else "N/A"),
-                "Yes" if checks["ssn_redacted"] else ("No" if doc_type in ["POA", "Affidavit"] else "N/A")
+                "Yes" if checks["ssn_redacted"] else ("No" if doc_type in ["POA", "Affidavit"] else "N/A"),
+                "Yes" if checks["cover_page_attached"] else ("No" if state == "GA" and doc_type == "SD" else "N/A")
             ]
             doc_data.append(row)
         self.add_section("Documents", doc_data, doc_headers)
 
         # Riders
-        rider_headers = ["Type", "Custom Name", "Correct", "Cover Page Attached"]
+        rider_headers = ["Type", "Custom Name", "Correct"]
         rider_data = [
             [
                 rider["type"],
                 rider["custom_name"],
-                "Yes" if rider["correct"] else "No",
-                "Yes" if rider["cover_page_attached"] else ("No" if state == "GA" else "N/A")
+                "Yes" if rider["correct"] else "No"
             ] for rider in riders
         ]
         self.add_section("Riders", rider_data, rider_headers)

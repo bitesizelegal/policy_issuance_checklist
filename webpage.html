@@ -19,12 +19,12 @@
       <th>Legal Attached</th><th>Exh B Attached</th><th>Other Exhs Attached</th>
       <th>Exec Date Correct</th><th>Rec Date Correct</th><th>Book-Page Correct</th>
       <th>Rec Time Correct</th><th>Tax Parcel Correct</th><th>Marital Status Correct</th>
-      <th>SSN Redacted</th>
+      <th>SSN Redacted</th><th>Cover Page Attached</th>
     </tr>
   </table>
   <h3>Riders</h3>
   <table id="riderTable">
-    <tr><th>Type</th><th>Custom Name</th><th>Correct</th><th>Cover Page Attached</th></tr>
+    <tr><th>Type</th><th>Custom Name</th><th>Correct</th></tr>
   </table>
   <h3>Title Endorsements</h3>
   <table id="endorsementTable">
@@ -61,6 +61,7 @@
           row.insertCell().textContent = doc.checks.tax_parcel_number_correct ? 'Yes' : 'No';
           row.insertCell().textContent = doc.checks.marital_status_correct ? 'Yes' : 'No';
           row.insertCell().textContent = doc.checks.ssn_redacted ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.cover_page_attached ? 'Yes' : 'No';
         });
 
         const riderTable = document.getElementById('riderTable');
@@ -69,7 +70,6 @@
           row.insertCell().textContent = rider.type;
           row.insertCell().textContent = rider.custom_name;
           row.insertCell().textContent = rider.correct ? 'Yes' : 'No';
-          row.insertCell().textContent = rider.cover_page_attached ? 'Yes' : 'No';
         });
 
         const endorsementTable = document.getElementById('endorsementTable');

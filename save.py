@@ -31,6 +31,9 @@ class ChecklistSave:
             if doc_type in ["POA", "Affidavit"] and not doc["ssn_redacted"].get():
                 messagebox.showerror("Error", f"SSN Redaction required for {doc_type}. Please correct and restart.")
                 return
+            if state == "GA" and doc_type == "SD" and not doc["cover_page_attached"].get():
+                messagebox.showerror("Error", f"Cover Page must be attached for GA Security Deeds. Please correct and restart.")
+                return
 
         # Validate riders
         for rider in self.riders:
@@ -77,7 +80,8 @@ class ChecklistSave:
                         "recording_date_time_correct": doc["recording_date_time_correct"].get(),
                         "tax_parcel_number_correct": doc["tax_parcel_number_correct"].get() if doc["type"].get() == "Deed" and state == "GA" else True,
                         "marital_status_correct": doc["marital_status_correct"].get() if doc["type"].get() in ["Deed", "Mortgage"] and state == "AL" else True,
-                        "ssn_redacted": doc["ssn_redacted"].get() if doc["type"].get() in ["POA", "Affidavit"] else False
+                        "ssn_redacted": doc["ssn_redacted"].get() if doc["type"].get() in ["POA", "Affidavit"] else False,
+                        "cover_page_attached": doc["cover_page_attached"].get() if doc["type"].get() == "SD" and state == "GA" else False
                     }
                 } for doc in self.documents
             ],
@@ -86,7 +90,6 @@ class ChecklistSave:
                     "type": rider["type"].get(),
                     "custom_name": rider["custom_name"].get() if rider["type"].get() == "Custom" else "",
                     "correct": rider["correct"].get(),
-                    "cover_page_attached": rider["cover_page"].get() if self.state.get() == "GA" else False
                 } for rider in self.riders
             ],
             "title_endorsements": [
