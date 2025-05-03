@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checklist Viewer</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h2>Title Policy Checklist</h2>
+  <h3>File Number: <span id="fileNumber"></span></h3>
+  <h3>Lender: <span id="lender"></span></h3>
+  <h3>Documents</h3>
+  <table id="docTable">
+    <tr>
+      <th>Type</th><th>Names Correct</th><th>Signatures Present</th><th>Correct Notary Block</th>
+      <th>Legal Attached</th><th>Exh B Attached</th><th>Other Exhs Attached</th>
+      <th>Exec Date Correct</th><th>Rec Date Correct</th><th>Book-Page Correct</th>
+      <th>Rec Time Correct</th><th>Tax Parcel Correct</th><th>Marital Status Correct</th>
+      <th>SSN Redacted</th>
+    </tr>
+  </table>
+  <h3>Riders</h3>
+  <table id="riderTable">
+    <tr><th>Type</th><th>Custom Name</th><th>Correct</th><th>Cover Page Attached</th></tr>
+  </table>
+  <h3>Title Endorsements</h3>
+  <table id="endorsementTable">
+    <tr><th>Type</th><th>Custom Name</th><th>Correct</th></tr>
+  </table>
+  <h3>Second Position Check</h3>
+  <table id="secondPositionTable">
+    <tr><th>Second Position</th><th>Reflected in Policy Exceptions</th></tr>
+  </table>
+  <script>
+    const fileName = window.location.pathname.split('/').pop();
+    const fileNumber = fileName.split('_')[0];
+    document.getElementById('fileNumber').textContent = fileNumber;
+
+    fetch(`${fileNumber}_checklist.json`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('lender').textContent = data.lender || "None";
+
+        const docTable = document.getElementById('docTable');
+        data.documents.forEach(doc => {
+          const row = docTable.insertRow();
+          row.insertCell().textContent = doc.type;
+          row.insertCell().textContent = doc.checks.names_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.signatures_present ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.correct_notary_block ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.legal_attached ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.exhibit_b_attached ? 'Yes' : 'N/A';
+          row.insertCell().textContent = doc.checks.other_exhibits_attached ? 'Yes' : 'N/A';
+          row.insertCell().textContent = doc.checks.execution_date_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.recording_date_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.recording_book_page_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.recording_date_time_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.tax_parcel_number_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.marital_status_correct ? 'Yes' : 'No';
+          row.insertCell().textContent = doc.checks.ssn_redacted ? 'Yes' : 'No';
+        });
+
+        const riderTable = document.getElementById('riderTable');
+        data.riders.forEach(rider => {
+          const row = riderTable.insertRow();
+          row.insertCell().textContent = rider.type;
+          row.insertCell().textContent = rider.custom_name;
+          row.insertCell().textContent = rider.correct ? 'Yes' : 'No';
+          row.insertCell().textContent = rider.cover_page_attached ? 'Yes' : 'No';
+        });
+
+        const endorsementTable = document.getElementById('endorsementTable');
+        data.title_endorsements.forEach(endorsement => {
+          const row = endorsementTable.insertRow();
+          row.insertCell().textContent = endorsement.type;
+          row.insertCell().textContent = endorsement.custom_name;
+          row.insertCell().textContent = endorsement.correct ? 'Yes' : 'No';
+        });
+
+        const secondPositionTable = document.getElementById('secondPositionTable');
+        const secondPositionRow = secondPositionTable.insertRow();
+        secondPositionRow.insertCell().textContent = data.second_position.is_second_position ? 'Yes' : 'No';
+        secondPositionRow.insertCell().textContent = data.second_position.reflected_in_policy_exceptions ? 'Yes' : (data.second_position.is_second_position ? 'No' : 'N/A');
+      });
+  </script>
+</body>
+</html>
